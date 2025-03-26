@@ -130,7 +130,18 @@ public class RsaUtil {
     }
 
     public static String signPrivateKey(String dataStr, String privateKey) throws Exception {
-        return signPrivateKey(dataStr.getBytes(StandardCharsets.UTF_8), privateKey);
+        return signPrivateKey(dataStr.getBytes(StandardCharsets.UTF_8), privateKey .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
+                .replace("-----END RSA PRIVATE KEY-----", ""));
+    }
+
+    public static boolean verifyPublicKey(String dataStr, String publicKey, String sign) throws Exception {
+        return verifyPublicKey(dataStr.getBytes(StandardCharsets.UTF_8), publicKey
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replace("-----BEGIN RSA PUBLIC KEY-----", "")
+                .replace("-----END RSA PUBLIC KEY-----", ""), sign);
     }
 
     private static boolean verifyPublicKey(byte[] data, String publicKey, String sign) throws Exception {
@@ -144,9 +155,6 @@ public class RsaUtil {
         return signature.verify(Base64Utils.decode(sign));
     }
 
-    public static boolean verifyPublicKey(String dataStr, String publicKey, String sign) throws Exception {
-        return verifyPublicKey(dataStr.getBytes(StandardCharsets.UTF_8), publicKey, sign);
-    }
 
     public static String decodePrivateKey(String encryptedData, String privateKey) throws Exception {
         final byte[] bytes = decrypt(Base64Utils.decode(encryptedData), privateKey, false);
