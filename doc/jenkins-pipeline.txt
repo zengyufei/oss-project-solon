@@ -1,0 +1,74 @@
+// jenkins pipeline oss-project 构建备份
+
+
+pipeline {
+    agent any // 使用任何可用的代理节点
+
+    options {
+        buildDiscarder(logRotator(daysToKeepStr: '7', numToKeepStr: '7')) // 配置构建丢弃策略，保留7天内的构建，最大保留7个构建
+        disableConcurrentBuilds() // 禁用并发构建
+        timestamps() // 在控制台输出中添加时间戳
+    }
+
+    parameters {
+        string(name: 'PROJECT_E_NAME', defaultValue: 'oss-project', description: '项目英文名称')
+        gitParameter branchFilter: 'origin/(.*)',
+                     defaultValue: 'master',
+                     name: 'BRANCHER',
+                     selectedValue: 'DEFAULT',
+                     sortMode: 'DESCENDING_SMART',
+                     type: 'PT_BRANCH_TAG',
+					 description: '选择构建分支'
+		choice(name: 'sonarQube', choices: ['False','True'], description: '执行 sonar 检查')
+        string(name: 'TARGET_DIR', defaultValue: './target', description: 'Maven 自动打包之后目标文件的父路径')
+        string(name: 'JAR_NAME', defaultValue: 'oss-project.jar', description: '打包之后目标文件的文件名')
+        string(name: 'GIT_URL', defaultValue: 'https://gitee.com/zengyufei/oss-project', description: 'Git 地址')
+        string(name: 'CREDENTIALS', defaultValue: 'gitee', description: '秘钥')
+        string(name: 'MAVEN_HOME', defaultValue: '/mnt/apache-maven-3.8.4', description: 'Maven 路径')
+        string(name: 'JAVA_HOME', defaultValue: '/mnt/jdk-17.0.10', description: 'JDK 路径')
+    }
+
+    environment {
+        MVN_PATH = "${params.MAVEN_HOME}/bin/mvn" // 设置 Maven 可执行文件的路径
+        JAVA_HOME = "${params.JAVA_HOME}" // 设置 JDK 的路径
+    }
+
+    triggers {
+        pollSCM('*/2 * * * *') // 配置 SCM 轮询触发器，每 2 分钟检查一次代码库是否有更改
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                 // 从指定的 Git 仓库和分支检出代码
+                git branch: "${params.BRANCHER}", credentialsId: "${params.CREDENTIALS}", url: "${params.GIT_URL}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+
+                // 使用指定的 JAVA_HOME 和 PATH 进行构建
+                withEnv(["JAVA_HOME=${params.JAVA_HOME}", "PATH+JDK=${params.JAVA_HOME}/bin"]) {
+
+
+                    sh """
+                        #!/bin/bash
+
+                        echo $JAVA_HOME
+
+                        ${env.MVN_PATH} -U -T 1C clean package -Dmaven.test.skip=true -gs /mnt/settings.xml
+
+                        ssh root@nginx "cd /docker/oss; rm -rf ${params.JAR_NAME}"
+
+                        scp -P 22 -v ${params.TARGET_DIR}/${params.JAR_NAME} root@nginx:/docker/oss/
+
+                        ssh root@nginx "source /etc/profile;cd /docker/oss; bash run.sh restart"
+                    """
+                }
+            }
+        }
+
+    }
+
+}

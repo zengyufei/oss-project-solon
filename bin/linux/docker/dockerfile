@@ -1,0 +1,18 @@
+FROM open-liberty:22.0.0.9-full-java17-openj9
+# FROM amazoncorretto:17-alpine
+USER root
+
+RUN mkdir -p /usr/jar
+
+WORKDIR /usr/jar
+
+ARG JAR_FILE=oss-project.jar
+
+COPY ${JAR_FILE} oss-project.jar
+
+EXPOSE 8081
+
+ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms128m -Xmx256m"
+
+CMD java -jar -Dsolon.env=prod -Dsolon.alone oss-project.jar $JAVA_OPTS
+

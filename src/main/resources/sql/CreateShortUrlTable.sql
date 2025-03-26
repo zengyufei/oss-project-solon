@@ -1,0 +1,8 @@
+CREATE TABLE t_short_url (
+  shortUrl TEXT PRIMARY KEY NOT NULL,
+  baseUrl TEXT NOT NULL,
+  longUrl TEXT NOT NULL,
+  visit INTEGER NOT NULL DEFAULT 0,
+  createdTime DATETIME DEFAULT NULL,
+  updatedTime DATETIME DEFAULT NULL
+)

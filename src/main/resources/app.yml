@@ -1,0 +1,63 @@
+server.port: 8081
+#server:
+#  websocket:
+#    port: 8082
+#应用配置文件活动选择（可用于切换不同的环境配置）
+solon.env: dev
+#服务上下文路径
+#server.contextPath: "!/oss" #v1.11.2 后支持
+
+#例：
+# app.yml      #应用主配置（必然会加载）
+# app-dev.yml  #应用dev环境配置
+# app-pro.yml  #应用pro环境配置
+
+solon.app:
+  name: file
+  group: dem
+#设定最大的请求包大小（或表单项的值大小）//默认: 2m
+server.request.maxBodySize: 500mb #kb,mb
+#设定最大的上传文件大小
+server.request.maxFileSize: 500mb #kb,mb (默认使用 maxBodySize 配置值)
+#设定请求体编码
+server.request.encoding: "utf-8"
+
+#设定响应体编码
+server.response.encoding: "utf-8"
+
+files:
+  cache:
+    expire: 10000
+    refresh: 10000
+  public:
+    prefix:
+    suffix:
+      - "txt"
+      - "bat"
+      - "sh"
+      - "msi"
+      - "png"
+      - "doc"
+      - "apk"
+      - "exe"
+      - "rar"
+      - "zip"
+      - "java"
+    fullName:
+
+############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
+sa-token:
+    # token 名称（同时也是 cookie 名称）
+    token-name: satoken
+    # token 有效期（单位：秒） 默认30天，-1 代表永久有效
+    timeout: 2592000
+    # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
+    active-timeout: -1
+    # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
+    is-concurrent: true
+    # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
+    is-share: true
+    # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
+    token-style: uuid
+    # 是否输出操作日志
+    is-log: true

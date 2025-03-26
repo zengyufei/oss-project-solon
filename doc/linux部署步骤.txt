@@ -1,0 +1,6 @@
+
+替换 oss-project.jar
+
+执行命令
+
+source /etc/profile;bash restart.sh

@@ -1,0 +1,24 @@
+version: '3'
+services:
+  oss:
+    image: open-liberty:22.0.0.9-full-java17-openj9
+    container_name: oss
+    logging:
+      driver: json-file
+      options:
+        max-file: '1'
+        max-size: 1g
+    ports:
+      - "5555:8081"
+    privileged: true
+    restart: always
+    user: root
+    environment:
+      - TZ=Asia/Shanghai
+      - JAVA_OPTS='-Xms128m -Xmx256m'
+    working_dir: /usr/jar
+    command: /bin/bash -c "java -jar -Dsolon.env=prod -Dsolon.alone oss-project.jar $${JAVA_OPTS}"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./oss-project.jar:/usr/jar/oss-project.jar:ro
+      - ./db:/usr/jar/db:rw

@@ -1,0 +1,36 @@
+# 设定最大的上传文件大小 kb,mb (默认使用 maxBodySize 配置值)
+server.request.maxFileSize: 1000mb
+
+
+files:
+  type: local # local/aliyun
+  local:
+    windows:
+      path: d:/cache/oss
+    linux:
+      path: /home/oss
+  aliyun:
+    bucket: xm-apk
+    endpoint: oss-cn-shenzhen.aliyuncs.com
+    accessKey: LsBVnb200GF4LBAk
+    secretKey: YyRQmmJeAGvFp7bxfIKnPjlGKgqs5K
+  cache:
+    expire: 600000
+    refresh: 600000
+  shortUrl:
+    show-host: localhost
+    host: localhost
+    port: 8081
+
+
+base.checkToken: true
+base.url: /api/v2/file/download
+base.username: mybatisplus
+base.password: mybatisplus
+
+
+
+
+# github oauth
+base.client_id: "7916a4aeac302bc69489"
+base.client_secret: "ac6cc78a15d15da76db272be083b9a251bde2693"
